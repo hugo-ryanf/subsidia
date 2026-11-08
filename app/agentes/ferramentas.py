@@ -167,7 +167,7 @@ def obter_epi(caixa: Caixa) -> str:
 
 
 def obter_ltcat(caixa: Caixa) -> str:
-    l = _chamar_sistema(caixa, "ltcat", lambda: S.laudo_ltcat())["dados"]
+    l = _chamar_sistema(caixa, "ltcat", S.laudo_ltcat, caixa.matricula)["dados"]
     return f"LTCAT ({l['setor']}): agente {l['agente']}. Conclusão: {l['conclusao']}"
 
 

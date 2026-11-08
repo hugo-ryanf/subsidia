@@ -40,39 +40,39 @@ def _vazio(sistema: str, motivo: str) -> dict:
 
 
 def _matricula(m: str) -> None:
-    if m != D.FUNCIONARIO["matricula"]:
+    if m not in D.FUNCIONARIOS:
         raise KeyError(f"matrícula {m} não encontrada no cadastro")
 
 
 def buscar_funcionario(termo: str) -> dict:
-    f = D.FUNCIONARIO
-    t = termo.lower().replace(".", "").replace("-", "")
-    if t in f["nome"].lower() or t == f["cpf"].replace(".", "").replace("-", "") or t == f["matricula"]:
-        return _ok("rh", f, P.ficha_registro(), f"ficha_registro_{f['matricula']}.pdf")
+    t = termo.strip().lower().replace(".", "").replace("-", "")
+    for f in D.FUNCIONARIOS.values():
+        if t and (t in f["nome"].lower() or t == f["cpf"].replace(".", "").replace("-", "") or t == f["matricula"]):
+            return _ok("rh", f, P.ficha_registro(f["matricula"]), f"ficha_registro_{f['matricula']}.pdf")
     return _vazio("rh", f"nenhum empregado encontrado para '{termo}'")
 
 
 def ponto(matricula: str, competencia: str) -> dict:
     _matricula(matricula)
-    marc = D.ponto(competencia)
+    marc = D.ponto(competencia, matricula)
     if marc is None:
         return _vazio("ponto", f"sem marcações de ponto para a competência {competencia}")
     return _ok("ponto", {"competencia": competencia, "marcacoes": marc,
                          "minutos_extras": D.minutos_extras(marc)},
-               P.cartao_ponto(competencia), f"espelho_ponto_{competencia}.pdf")
+               P.cartao_ponto(competencia, matricula=matricula), f"espelho_ponto_{competencia}.pdf")
 
 
 def holerite(matricula: str, competencia: str) -> dict:
     _matricula(matricula)
-    h = D.holerite(competencia)
+    h = D.holerite(competencia, matricula)
     if h is None:
         return _vazio("folha", f"sem holerite para a competência {competencia}")
-    return _ok("folha", h, P.holerite(competencia), f"holerite_{competencia}.pdf")
+    return _ok("folha", h, P.holerite(competencia, matricula), f"holerite_{competencia}.pdf")
 
 
 def trct(matricula: str) -> dict:
     _matricula(matricula)
-    return _ok("folha", D.trct(), P.trct(), "trct.pdf")
+    return _ok("folha", D.trct(matricula), P.trct(matricula), "trct.pdf")
 
 
 def extrato_fgts(matricula: str, processo_id: str = "") -> dict:
@@ -81,26 +81,26 @@ def extrato_fgts(matricula: str, processo_id: str = "") -> dict:
         if processo_id not in _falhou_uma_vez:
             _falhou_uma_vez.add(processo_id)
             raise SistemaIndisponivel("FGTS Digital respondeu HTTP 503 (serviço temporariamente indisponível)")
-    return _ok("fgts", D.extrato_fgts(), P.extrato_fgts(), "extrato_fgts.pdf")
+    return _ok("fgts", D.extrato_fgts(matricula), P.extrato_fgts(matricula), "extrato_fgts.pdf")
 
 
 def epi(matricula: str) -> dict:
     _matricula(matricula)
-    return _ok("sst", {"entregas": D.fichas_epi()}, P.ficha_epi(), "ficha_epi.pdf")
+    return _ok("sst", {"entregas": D.fichas_epi(matricula)}, P.ficha_epi(matricula), "ficha_epi.pdf")
 
 
-def laudo_ltcat() -> dict:
-    return _ok("sst", D.ltcat(), P.ltcat(), "ltcat.pdf")
+def laudo_ltcat(matricula: str = D.DEMO) -> dict:
+    return _ok("sst", D.ltcat(matricula), P.ltcat(matricula), "ltcat.pdf")
 
 
 def ocorrencias(matricula: str) -> dict:
     _matricula(matricula)
-    o = D.ocorrencias()
+    o = D.ocorrencias(matricula)
     if not o:
         return _vazio("rh", "nenhuma ocorrência, advertência ou reclamação interna registrada")
-    return _ok("rh", o)
+    return _ok("rh", o, P.ocorrencias(matricula), f"ocorrencias_{matricula}.pdf")
 
 
 def competencias_contrato(matricula: str) -> list[str]:
     _matricula(matricula)
-    return D.competencias()
+    return D.competencias(matricula)

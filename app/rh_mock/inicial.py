@@ -65,15 +65,76 @@ _TEXTO = [
 ]
 
 
+NUMERO_2 = "0000456-78.2025.5.06.0003"
+
+PEDIDOS_2 = [
+    ("horas_extras", "Horas extras e reflexos", 14200.00),
+    ("intervalo", "Intervalo intrajornada suprimido (art. 71, § 4º, CLT)", 5400.00),
+    ("multa_477", "Multa do art. 477, § 8º, da CLT", 1600.00),
+    ("fgts", "Diferenças de FGTS + multa de 40%", 2100.00),
+    ("insalubridade", "Adicional de insalubridade em grau médio e reflexos", 6800.00),
+    ("assedio_moral", "Indenização por assédio moral", 15000.00),
+]
+
+_TEXTO_2 = [
+    ("EXCELENTÍSSIMO(A) SENHOR(A) JUIZ(A) DA 3ª VARA DO TRABALHO DE RECIFE/PE", None),
+    (f"Processo nº {NUMERO_2}", None),
+    (None, (
+        f"{D.SEGUNDA['nome'].upper()}, brasileira, casada, auxiliar de limpeza, CPF {D.SEGUNDA['cpf']}, "
+        "residente em Recife/PE, por sua advogada, vem propor a presente RECLAMAÇÃO TRABALHISTA, pelo rito "
+        f"ordinário, em face de {D.EMPRESA['razao_social'].upper()}, CNPJ {D.EMPRESA['cnpj']}, com sede na "
+        f"{D.EMPRESA['endereco']}, pelos fatos e fundamentos a seguir."
+    )),
+    ("I - DO CONTRATO DE TRABALHO", (
+        "A reclamante foi admitida em 14/08/2023 para a função de auxiliar de limpeza, com salário de "
+        "R$ 1.600,00, e dispensada sem justa causa em 31/01/2025."
+    )),
+    ("II - DA JORNADA DE TRABALHO E DAS HORAS EXTRAS", (
+        "Durante todo o contrato, a reclamante laborava de segunda a sexta-feira das 7h às 18h e aos sábados "
+        "das 7h às 15h, sem jamais receber o pagamento das horas extras prestadas, nem os reflexos em DSR, "
+        "férias + 1/3, 13º salário e FGTS."
+    )),
+    ("III - DO INTERVALO INTRAJORNADA", (
+        "Em grande parte do contrato, a reclamante usufruía de apenas 30 (trinta) minutos de intervalo para "
+        "refeição e descanso, fazendo jus ao pagamento do período suprimido com adicional de 50%, nos termos "
+        "do art. 71, § 4º, da CLT."
+    )),
+    ("IV - DAS VERBAS RESCISÓRIAS E DA MULTA DO ART. 477 DA CLT", (
+        "As verbas rescisórias foram pagas somente em fevereiro de 2025, além do prazo de 10 dias previsto no "
+        "art. 477, § 6º, da CLT, sendo devida a multa do § 8º do mesmo artigo, no valor de um salário."
+    )),
+    ("V - DO FGTS", (
+        "A reclamada deixou de efetuar depósitos do FGTS em competências do contrato, sendo devidas as "
+        "diferenças acrescidas da multa de 40%."
+    )),
+    ("VI - DO ADICIONAL DE INSALUBRIDADE", (
+        "A reclamante manuseava diariamente produtos alcalinos de limpeza, sem o fornecimento regular de "
+        "luvas e demais equipamentos de proteção, fazendo jus ao adicional de insalubridade em grau médio "
+        "(20%), nos termos da NR-15, Anexo 13, com reflexos legais."
+    )),
+    ("VII - DO ASSÉDIO MORAL", (
+        "A reclamante era alvo de cobranças em tom ofensivo da supervisora Márcia Tavares, na frente de "
+        "colegas. Os fatos foram denunciados no canal interno da empresa, que nada fez. Requer indenização "
+        "por assédio moral no valor de R$ 15.000,00."
+    )),
+]
+
+_CASOS = {
+    D.DEMO: (_TEXTO, PEDIDOS, "Recife/PE, 10 de março de 2025.\nAdvogado(a) do reclamante - OAB/PE (fictício)"),
+    D.SEGUNDA["matricula"]: (_TEXTO_2, PEDIDOS_2, "Recife/PE, 14 de abril de 2025.\nAdvogada da reclamante - OAB/PE (fictício)"),
+}
+
+
 def _brl(v: float) -> str:
     return f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
-def gerar_pdf() -> bytes:
+def gerar_pdf(matricula: str = D.DEMO) -> bytes:
+    texto, pedidos, fecho = _CASOS[matricula]
     pdf = FPDF()
     pdf.set_auto_page_break(True, 20)
     pdf.add_page()
-    for titulo, corpo in _TEXTO:
+    for titulo, corpo in texto:
         if titulo:
             pdf.set_font("Helvetica", "B", 11)
             pdf.multi_cell(0, 6, titulo, new_x="LMARGIN", new_y="NEXT")
@@ -88,15 +149,14 @@ def gerar_pdf() -> bytes:
     pdf.set_font("Helvetica", "", 11)
     pdf.multi_cell(0, 6, "Diante do exposto, requer a condenação da reclamada ao pagamento de:",
                    new_x="LMARGIN", new_y="NEXT")
-    for letra, (_, desc, valor) in zip("abcdefgh", PEDIDOS):
+    for letra, (_, desc, valor) in zip("abcdefgh", pedidos):
         pdf.multi_cell(0, 6, f"{letra}) {desc}: {_brl(valor)};", new_x="LMARGIN", new_y="NEXT")
-    total = sum(v for *_, v in PEDIDOS)
+    total = sum(v for *_, v in pedidos)
     pdf.ln(2)
     pdf.multi_cell(0, 6, "Requer a juntada, pela reclamada, dos controles de jornada de todo o período "
                          "contratual, sob pena de aplicação da Súmula 338 do TST.", new_x="LMARGIN", new_y="NEXT")
     pdf.ln(2)
     pdf.multi_cell(0, 6, f"Dá-se à causa o valor de {_brl(total)}.", new_x="LMARGIN", new_y="NEXT")
     pdf.ln(4)
-    pdf.multi_cell(0, 6, "Recife/PE, 10 de março de 2025.\nAdvogado(a) do reclamante - OAB/PE (fictício)",
-                   new_x="LMARGIN", new_y="NEXT")
+    pdf.multi_cell(0, 6, fecho, new_x="LMARGIN", new_y="NEXT")
     return bytes(pdf.output())
