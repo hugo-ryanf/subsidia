@@ -8,7 +8,7 @@ export type Pedido = {
 
 export type Triagem = {
   processo: Record<string, any> & { fontes: Fonte[] };
-  pedidos: Pedido[]; total_pedidos: number; valor_total_pedidos: number; requer_revisao: number;
+  pedidos: Pedido[]; total_pedidos: number; valor_total_pedidos: number; requer_revisao: number; aviso?: string;
 };
 
 export type Evidencia = { documento_id: string; nome: string; sistema: string; chave: string };

@@ -12,13 +12,31 @@ from app import db
 _REF = re.compile(r"\bD(\d+)\b")
 
 
-def rotular(chunks: list[dict], limite_chars: int = 60000) -> tuple[str, dict[str, dict]]:
+def em_blocos(chunks: list[dict], limite_chars: int) -> list[list[dict]]:
+    """Divide em blocos de até `limite_chars`, na ordem, sem perder nenhum chunk."""
+    blocos: list[list[dict]] = []
+    atual: list[dict] = []
+    total = 0
+    for c in chunks:
+        if atual and total + len(c["texto"]) > limite_chars:
+            blocos.append(atual)
+            atual, total = [], 0
+        atual.append(c)
+        total += len(c["texto"])
+    if atual:
+        blocos.append(atual)
+    return blocos
+
+
+def rotular(chunks: list[dict], limite_chars: int | None = None, inicio: int = 0) -> tuple[str, dict[str, dict]]:
+    """Rotula a partir de D{inicio + 1}. Com `limite_chars`, o excedente fica de fora: só use
+    quando o texto for uma amostra declarada; para ler tudo, divida antes com `em_blocos`."""
     refs: dict[str, dict] = {}
     partes, total = [], 0
     for c in chunks:
-        if total + len(c["texto"]) > limite_chars:
+        if limite_chars is not None and total + len(c["texto"]) > limite_chars:
             break
-        rot = f"D{len(refs) + 1}"
+        rot = f"D{inicio + len(refs) + 1}"
         refs[rot] = {"chunk_id": c["id"], "documento_id": c["documento_id"], "documento": c["documento"],
                      "classe": c.get("classe"), "pagina_inicio": c["pagina_inicio"],
                      "pagina_fim": c["pagina_fim"], "requer_revisao": bool(c.get("requer_revisao"))}
