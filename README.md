@@ -4,6 +4,23 @@
 >
 > **Demo ao vivo:** https://subsidia.onrender.com → "Rodar o caso de demonstração" (plano gratuito: após 15 min parado, o primeiro acesso leva ~1 min para acordar)
 
+## Ficha do projeto
+
+| | |
+|---|---|
+| **Projeto** | Subsídia |
+| **Time** | Canário Belga |
+| **Resumo** | Agente que lê a petição trabalhista, opera os sistemas de RH, cruza ponto, folha e FGTS e entrega a estratégia de defesa por pedido, com cada prova citada. |
+| **Vídeo demo** | _a preencher (link do vídeo)_ |
+| **Link do projeto** | https://subsidia.onrender.com |
+| **Apresentação** | [Descrição (PDF)](Subsidia_Descricao.pdf) · [Pitch (PPTX)](Subs%C3%ADdia%20Pitch.pptx) |
+| **Código-fonte** | https://github.com/hugo-ryanf/subsidia |
+| **Tags** | Digital Workers, RH, Jurídico trabalhista, AI agents, RAG, Legaltech, FastAPI, Desafio Tako |
+
+**Integrantes:** Rafael Henrique Ribeiro Amancio · Caio Vitor Melo De Santana · Hugo Ryan Santos de França
+
+## O problema e a solução
+
 Quando uma empresa recebe uma reclamação trabalhista, o advogado pede ao RH dezenas de documentos
 espalhados em vários sistemas (ponto, folha, FGTS, SST). Há idas e vindas, atraso e risco real: **sem
 cartão de ponto, a Justiça presume verdadeira a jornada alegada pelo ex-funcionário (Súmula 338 do TST)**.
