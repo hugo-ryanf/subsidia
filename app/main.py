@@ -159,3 +159,30 @@ def aprovar(processo_id: str, tipo: str, body: Aprovacao) -> dict:
     rastro.registrar("humano", f"aprovou:{tipo}", {"editado": body.conteudo is not None,
                                                   "observacao": body.observacao}, processo_id=processo_id)
     return {"aprovado": True, "tipo": tipo}
+
+
+@app.post("/processos/{processo_id}/subsidios", status_code=202)
+def disparar_subsidios(processo_id: str) -> dict:
+    from app.agentes import subsidios
+    _processo(processo_id)
+    return {"job_id": jobs.disparar(processo_id, "subsidios", lambda jid: subsidios.executar(processo_id, jid))}
+
+
+class Resolucao(BaseModel):
+    status: str            # resolvida | descartada
+    resolucao: str         # o que o humano fez/decidiu (obrigatório: descarte nunca é silencioso)
+
+
+@app.post("/processos/{processo_id}/pendencias/{pendencia_id}")
+def resolver_pendencia(processo_id: str, pendencia_id: str, body: Resolucao) -> dict:
+    _processo(processo_id)
+    if body.status not in ("resolvida", "descartada") or not body.resolucao.strip():
+        raise HTTPException(422, "status deve ser resolvida|descartada e a resolução é obrigatória")
+    p = db.um("SELECT * FROM pendencias WHERE id=? AND processo_id=?", (pendencia_id, processo_id))
+    if not p:
+        raise HTTPException(404, "pendência não existe")
+    db.executar("UPDATE pendencias SET status=?, resolucao=?, resolvido_em=? WHERE id=?",
+                (body.status, body.resolucao, db.agora(), pendencia_id))
+    rastro.registrar("humano", f"pendencia:{body.status}", {"titulo": p["titulo"], "resolucao": body.resolucao},
+                     processo_id=processo_id)
+    return {"ok": True}
