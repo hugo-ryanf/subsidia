@@ -115,3 +115,47 @@ def buscar(processo_id: str, body: Pergunta) -> dict:
 def obter_rastro(processo_id: str) -> dict:
     _processo(processo_id)
     return rastro.resumo(processo_id)
+
+
+# --- demo ------------------------------------------------------------------------------
+
+@app.post("/demo/processo", status_code=202)
+def criar_processo_demo() -> dict:
+    """Cria o processo de demonstração e ingere a petição inicial sintética."""
+    from app.rh_mock import inicial
+    pid = db.novo_id("proc_")
+    db.executar("INSERT INTO processos(id,nome,criado_em) VALUES(?,?,?)",
+                (pid, f"Reclamação {inicial.NUMERO} (demo)", db.agora()))
+    conteudo = inicial.gerar_pdf()
+    caminho, sha = ingestao.guardar_arquivo(pid, "peticao_inicial.pdf", conteudo)
+    doc_id = ingestao.registrar_documento(pid, "peticao_inicial.pdf", sha, "autos", "upload")
+    job_id = jobs.disparar(pid, "ingestao", lambda jid: ingestao.processar(doc_id, caminho))
+    return {"processo_id": pid, "job_id": job_id}
+
+
+# --- agentes ---------------------------------------------------------------------------
+
+@app.post("/processos/{processo_id}/triagem", status_code=202)
+def disparar_triagem(processo_id: str) -> dict:
+    from app.agentes import triagem
+    _processo(processo_id)
+    return {"job_id": jobs.disparar(processo_id, "triagem", lambda jid: triagem.executar(processo_id, jid))}
+
+
+class Aprovacao(BaseModel):
+    conteudo: dict | None = None   # versão editada pelo humano (opcional)
+    observacao: str | None = None
+
+
+@app.post("/processos/{processo_id}/aprovar/{tipo}")
+def aprovar(processo_id: str, tipo: str, body: Aprovacao) -> dict:
+    """Portão humano entre etapas: o agente prepara, a pessoa aprova (e pode editar)."""
+    _processo(processo_id)
+    atual = db.artefato(processo_id, tipo)
+    if not atual:
+        raise HTTPException(409, f"não há {tipo} gerado para aprovar")
+    conteudo = body.conteudo or atual["conteudo"]
+    db.salvar_artefato(processo_id, tipo, conteudo, aprovado=True)
+    rastro.registrar("humano", f"aprovou:{tipo}", {"editado": body.conteudo is not None,
+                                                  "observacao": body.observacao}, processo_id=processo_id)
+    return {"aprovado": True, "tipo": tipo}
