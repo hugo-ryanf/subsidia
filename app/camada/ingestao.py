@@ -42,12 +42,9 @@ def processar(doc_id: str, caminho: Path) -> dict:
     processo_id = doc["processo_id"]
     db.executar("UPDATE documentos SET status='processando' WHERE id=?", (doc_id,))
     try:
+        # Parte lenta (extração, chunks, embedding pela rede) SEM transação aberta: segurar a
+        # trava de escrita do SQLite durante a chamada de rede travava as outras threads.
         paginas = extracao.extrair(caminho)
-        for p in paginas:
-            db.conn().execute(
-                "INSERT OR REPLACE INTO paginas VALUES(?,?,?,?,?,?)",
-                (doc_id, p.numero, len(p.texto), p.confianca, int(p.requer_revisao), p.motivo),
-            )
         chunks = chunking.gerar(paginas)
 
         vetores: list[list[float] | None]
@@ -58,7 +55,12 @@ def processar(doc_id: str, caminho: Path) -> dict:
             vetores = [None] * len(chunks)
             rastro.registrar("erro", "embedding", {"documento": doc["nome"], "erro": str(e)})
 
-        c = db.conn()
+        c = db.conn()  # daqui até o commit: uma transação curta, só escrita local
+        for p in paginas:
+            c.execute(
+                "INSERT OR REPLACE INTO paginas VALUES(?,?,?,?,?,?)",
+                (doc_id, p.numero, len(p.texto), p.confianca, int(p.requer_revisao), p.motivo),
+            )
         for ch, vet in zip(chunks, vetores):
             cid = db.novo_id("chk_")
             motivo = ch.motivo

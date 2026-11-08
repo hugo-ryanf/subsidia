@@ -73,6 +73,7 @@ export const api = {
   jobs: (id: string) => req<Record<string, Job>>(`/processos/${id}/jobs`),
   job: (id: string) => req<Job>(`/jobs/${id}`),
   rastro: (id: string) => req<Rastro>(`/processos/${id}/rastro`),
+  pronto: () => req<{ processo_id: string }>("/demo/pronto", { method: "POST" }),
   demo: () => req<{ processo_id: string; job_id: string }>("/demo/processo", { method: "POST" }),
   criar: (nome: string) => req<{ processo_id: string }>("/processos", json({ nome })),
   upload: (id: string, f: File) => {

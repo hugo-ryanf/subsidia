@@ -45,6 +45,8 @@ main { max-width: 1400px; margin: 0 auto; padding: 20px 24px 60px; }
 .hero { padding: 36px 0 20px; max-width: 820px; }
 .hero h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; }
 .hero p { font-size: 1.05rem; color: var(--muted); }
+.cta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+button.grande-sec { font-size: 1.05rem; padding: 11px 20px; }
 .form-linha { display: flex; gap: 10px; flex-wrap: wrap; }
 .form-linha input { flex: 1 1 220px; }
 .lista { list-style: none; padding: 0; margin: 0; }

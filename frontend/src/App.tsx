@@ -48,6 +48,10 @@ function Inicio({ abrir }: { abrir: (id: string) => void }) {
     setOcupado(true); setErro(null);
     try { const r = await api.demo(); abrir(r.processo_id); } catch (e: any) { setErro(e.message); setOcupado(false); }
   };
+  const pronto = async () => {
+    setOcupado(true); setErro(null);
+    try { const r = await api.pronto(); abrir(r.processo_id); } catch (e: any) { setErro(e.message); setOcupado(false); }
+  };
   const enviar = async () => {
     if (!arquivo) return;
     setOcupado(true); setErro(null);
@@ -63,8 +67,12 @@ function Inicio({ abrir }: { abrir: (id: string) => void }) {
         <h1>Da reclamação trabalhista à defesa pronta, com prova tirada dos sistemas de RH</h1>
         <p>O agente lê a petição, busca sozinho ponto, holerites, TRCT, FGTS e EPI, cruza os dados e mostra onde a
           empresa ganha e onde perde, sempre citando o documento. O que não fecha vai para uma pessoa decidir.</p>
-        <button className="grande" onClick={demo} disabled={ocupado}>▶ Rodar o caso de demonstração</button>
-        <p className="muted small">Mercado Exemplo Ltda × ex-repositor de câmara fria (dados 100% sintéticos)</p>
+        <div className="cta">
+          <button className="grande" onClick={pronto} disabled={ocupado}>⚡ Ver caso já analisado</button>
+          <button className="sec grande-sec" onClick={demo} disabled={ocupado}>▶ Rodar o agente ao vivo (~6 min)</button>
+        </div>
+        <p className="muted small">Mercado Exemplo Ltda × ex-repositor de câmara fria (dados 100% sintéticos). O caso analisado abre na hora,
+          com o rastro de tudo que o agente fez; ao vivo, você acompanha o agente trabalhando passo a passo.</p>
       </section>
       {erro && <div className="alerta">{erro}</div>}
       <section className="card">

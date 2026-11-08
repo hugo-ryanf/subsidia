@@ -87,7 +87,7 @@ def conn() -> sqlite3.Connection:
     c = getattr(_local, "conn", None)
     if c is None:
         cfg.db_path.parent.mkdir(parents=True, exist_ok=True)
-        c = sqlite3.connect(cfg.db_path, timeout=30, check_same_thread=False)
+        c = sqlite3.connect(cfg.db_path, timeout=60, check_same_thread=False)
         c.row_factory = sqlite3.Row
         c.execute("PRAGMA foreign_keys=ON")
         _local.conn = c

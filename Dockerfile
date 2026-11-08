@@ -14,6 +14,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ app/
 COPY eval/ eval/
+COPY seed/ seed/
 COPY --from=front /front/dist frontend/dist
 RUN mkdir -p /data
 VOLUME ["/data"]

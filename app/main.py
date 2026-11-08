@@ -133,6 +133,15 @@ def criar_processo_demo() -> dict:
     return {"processo_id": pid, "job_id": job_id}
 
 
+@app.post("/demo/pronto", status_code=201)
+def abrir_caso_pronto() -> dict:
+    """Cópia nova e independente de um caso já processado (resultado na hora)."""
+    from app import demo
+    if not demo.disponivel():
+        raise HTTPException(404, "caso pronto não disponível nesta instalação")
+    return {"processo_id": demo.clonar()}
+
+
 # --- agentes ---------------------------------------------------------------------------
 
 @app.post("/processos/{processo_id}/triagem", status_code=202)
