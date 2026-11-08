@@ -1,6 +1,8 @@
 # Subsídia — digital worker de contencioso trabalhista
 
 > Converge Challenge powered by Tako · **Desafio Tako: Digital Workers para RH**
+>
+> **Demo ao vivo:** https://subsidia.onrender.com → "Rodar o caso de demonstração" (plano gratuito: após 15 min parado, o primeiro acesso leva ~1 min para acordar)
 
 Quando uma empresa recebe uma reclamação trabalhista, o advogado pede ao RH dezenas de documentos
 espalhados em vários sistemas (ponto, folha, FGTS, SST). Há idas e vindas, atraso e risco real: **sem

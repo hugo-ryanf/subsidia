@@ -34,14 +34,19 @@ determinístico, para a coleta nunca parar. Nada é descartado em silêncio.
 - cerca de US$ 0,02 de IA por processo;
 - poucos minutos de agente contra cerca de 7,7 h estimadas da mesma coleta à mão.
 
-## 2. Ferramentas, modelos e APIs
+## 2. Links
+
+- Plataforma navegável e testável: https://subsidia.onrender.com (botão "Rodar o caso de demonstração"; abrir uns minutos antes para acordar o servidor gratuito)
+- Código: https://github.com/hugo-ryanf/subsidia (privado; liberar acesso se a organização pedir)
+
+## 3. Ferramentas, modelos e APIs
 
 - Featherless (API OpenAI-compatible): `zai-org/GLM-5.2`, `google/gemma-4-31B-it`, `Qwen/Qwen3-Embedding-4B`
 - FastAPI, SQLite (FTS5), NumPy, PyMuPDF, fpdf2, React, Vite, marked
 - Claude Code (assistente de desenvolvimento)
 - Sistemas de RH (ponto, folha, FGTS, SST, cadastro) **simulados** com dados sintéticos, como o desafio permite
 
-## 3. Roteiro do vídeo (~2 min)
+## 4. Roteiro do vídeo (~2 min)
 
 1. (0:00) Tela inicial: "Rodar o caso de demonstração". Uma frase sobre a dor (Súmula 338).
 2. (0:15) Triagem: os 6 pedidos, valores e citação clicável (abrir a página da petição).
@@ -53,7 +58,7 @@ determinístico, para a coleta nunca parar. Nada é descartado em silêncio.
 6. (1:35) Estratégia: risco por pedido, seção de horas extras com pontos fracos honestos e recomendação.
 7. (1:50) Painel de custo: US$ 0,02 e minutos × ~7,7 h manuais.
 
-## 4. Roteiro do pitch (3 min)
+## 5. Roteiro do pitch (3 min)
 
 - **0:00 Dor (30s).** "Toda empresa com funcionário recebe reclamação trabalhista. O advogado pede ao RH ponto,
   holerite, TRCT, FGTS, EPI... de 5 sistemas. Faltou o cartão de ponto? A Justiça presume que o ex-funcionário diz
