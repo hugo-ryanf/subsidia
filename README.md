@@ -11,7 +11,7 @@
 | **Projeto** | Subsídia |
 | **Time** | Canário Belga |
 | **Resumo** | Agente que lê a petição trabalhista, opera os sistemas de RH, cruza ponto, folha e FGTS e entrega a estratégia de defesa por pedido, com cada prova citada. |
-| **Vídeo demo** | _a preencher (link do vídeo)_ |
+| **Vídeo demo** | https://www.youtube.com/watch?v=zvCosxyy4FU |
 | **Link do projeto** | https://subsidia.onrender.com |
 | **Apresentação** | [Descrição (PDF)](Subsidia_Descricao.pdf) · [Pitch (PPTX)](Subs%C3%ADdia%20Pitch.pptx) |
 | **Código-fonte** | https://github.com/hugo-ryanf/subsidia |
