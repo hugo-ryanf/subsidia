@@ -273,7 +273,9 @@ function TelaProcesso({ pid, voltar }: { pid: string; voltar: () => void }) {
     // Petição indexada → a triagem começa sozinha (o humano aprova depois).
     if (j.status === "concluido" && j.tipo === "ingestao" && p && !p.artefatos.triagem) rodar("triagem");
   });
+  // Durante o job: rastro a cada 2 s (console ao vivo) e o processo inteiro a cada 6 s (contadores, pendências).
   usePolling(() => { api.rastro(pid).then(setRastro).catch(() => {}); }, 2000, !!jobId);
+  usePolling(() => { api.processo(pid).then(setProc).catch(() => {}); }, 6000, !!jobId);
 
   const aprovar = async (tipo: Etapa, proxima?: Etapa) => {
     setErro(null);
