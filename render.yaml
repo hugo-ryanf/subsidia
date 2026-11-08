@@ -1,0 +1,27 @@
+# Blueprint do Render: New → Blueprint → este repositório. Só LLM_API_KEY é pedida no painel.
+services:
+  - type: web
+    name: subsidia
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_BASE_URL
+        value: https://api.featherless.ai/v1
+      - key: MODEL_PESADO
+        value: zai-org/GLM-5.2
+      - key: MODEL_LEVE
+        value: google/gemma-4-31B-it
+      - key: EMBED_MODEL
+        value: Qwen/Qwen3-Embedding-4B
+      - key: EMBED_DIM
+        value: "2560"
+      - key: CUSTO_HORA_MANUAL
+        value: "80"
+      - key: DB_PATH
+        value: /data/subsidia.db
