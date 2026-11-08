@@ -47,7 +47,6 @@ da defesa são sempre do advogado.
 | Defesas comprovadas (TRCT no prazo, FGTS integral, EPI + LTCAT) | 3/3 |
 | Seções da estratégia com citação válida | 6/6 |
 | Documentos coletados nos sistemas | 52 |
-| Custo de IA do processo inteiro | ~US$ 0,02 |
 | Tempo do agente × mesma coleta manual (estimativa) | ~1–3 min × ~7,7 h |
 
 ## Integração real: AFD do ponto
