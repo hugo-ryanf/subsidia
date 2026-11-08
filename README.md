@@ -2,9 +2,7 @@
 
 > Converge Challenge powered by Tako · **Desafio Tako: Digital Workers para RH**
 >
-> **Demo ao vivo:** https://subsidia.onrender.com → "Rodar o caso de demonstração" (plano gratuito: após 15 min parado, o primeiro acesso leva ~1 min para acordar)
-
-## Ficha do projeto
+> **Demo ao vivo:** https://subsidia.onrender.com 
 
 | | |
 |---|---|
