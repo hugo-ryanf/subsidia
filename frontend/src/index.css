@@ -137,3 +137,11 @@ button.grande-sec { font-size: 1.05rem; padding: 11px 20px; }
 .ev-sub { color: var(--muted); word-break: break-word; }
 .ev-ferramenta .ev-ico { color: var(--pri); } .ev-decisao .ev-ico { color: var(--acc); }
 .ev-erro .ev-ico, .ev-erro .ev-tit { color: var(--bad); } .ev-humano .ev-ico { color: var(--ok); }
+
+.fonte { background: var(--info-bg); border-radius: 10px; padding: 12px 14px; margin: 6px 0 14px; }
+.fonte-cab { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; }
+.fonte-res { margin-top: 8px; line-height: 1.5; }
+.warn-tx { color: var(--warn); font-weight: 600; }
+.botao-arquivo { background: var(--pri); color: var(--pri-tx); border-radius: 8px; padding: 8px 14px; font-weight: 600; cursor: pointer; }
+.botao-arquivo input { display: none; }
+.botao-arquivo.desab { opacity: .5; cursor: wait; }

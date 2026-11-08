@@ -14,7 +14,9 @@ terceirização), seus departamentos jurídico e pessoal, e os escritórios que 
 
 **Solução.** Um agente que recebe a petição inicial e conduz a coleta de prova de ponta a ponta:
 1. separa cada pedido da reclamação, com valor, categoria, confiança e a página de onde tirou;
-2. **opera sozinho os sistemas da empresa**, decidindo a cada passo o que buscar, e anexa os documentos ao processo;
+2. **opera sozinho os sistemas da empresa**, decidindo a cada passo o que buscar, e anexa os documentos ao processo.
+   O ponto pode vir direto do **AFD**, o arquivo oficial que todo relógio de ponto do Brasil é obrigado a exportar
+   (Portarias 1510/2009 e 671/2021): funciona com qualquer empresa, sem integração com o fabricante;
 3. **cruza os dados com regras determinísticas** (ponto × holerite, prazo do TRCT, competências do FGTS, EPI e laudo):
    aponta onde a empresa ganha, onde perde e quanto está exposta;
 4. escala para um humano o que não fecha (documento ausente, prova que depende de testemunha), com o contexto pronto;
@@ -67,8 +69,9 @@ determinístico, para a coleta nunca parar. Nada é descartado em silêncio.
   sistemas, cruza os dados e mostra onde a empresa ganha e onde perde, sempre citando o documento."
 - **1:00 Demo ao vivo (75s).** Caso demo: achados e estratégia. Destaque: ele encontrou as horas extras que o
   próprio ponto registra e a folha não pagou, e disse com franqueza que nesse pedido vale avaliar acordo.
-- **2:15 Por que funciona fora da demo (20s).** Regras determinísticas para o risco, rastro auditável, retentativa
-  e fallback, portões humanos.
+- **2:15 Por que funciona fora da demo (20s).** Lê o AFD, o arquivo oficial que todo relógio de ponto exporta: não
+  depende de integrar com cada fabricante. Regras determinísticas para o risco, rastro auditável, retentativa e
+  fallback, portões humanos.
 - **2:35 Negócio (25s).** Cliente: empresas com contencioso de massa e os escritórios que as atendem. Cobrança por
   processo. Custo de IA de centavos contra horas de trabalho. Próximo passo: rodar no **desligamento**, auditando a
   rescisão antes de virar processo. *(Conferir no TST o volume anual de casos novos antes de citar número.)*

@@ -53,17 +53,18 @@ class _Doc(FPDF):
         return bytes(self.output())
 
 
-def cartao_ponto(comp: str) -> bytes | None:
-    marc = D.ponto(comp)
+def cartao_ponto(comp: str, marcacoes: list[dict] | None = None, sistema: str | None = None,
+                 rodape: str | None = None) -> bytes | None:
+    marc = marcacoes if marcacoes is not None else D.ponto(comp)
     if marc is None:
         return None
-    d = _Doc(f"Espelho de ponto - competência {comp}", "PontoFácil (registro eletrônico)")
+    d = _Doc(f"Espelho de ponto - competência {comp}", sistema or "PontoFácil (registro eletrônico)")
     d.linha(f"Jornada contratual: {D.FUNCIONARIO['jornada_contratual']}")
     linhas = [[m["data"], m["entrada"], m["saida_intervalo"] or "-", m["retorno_intervalo"] or "-", m["saida"]]
               for m in marc]
     d.tabela(["Data", "Entrada", "Saída intervalo", "Retorno", "Saída"], linhas, [32, 28, 34, 28, 28])
     d.ln(2)
-    d.linha("Espelho assinado eletronicamente pelo empregado no fechamento do mês.")
+    d.linha(rodape or "Espelho assinado eletronicamente pelo empregado no fechamento do mês.")
     return d.bytes()
 
 

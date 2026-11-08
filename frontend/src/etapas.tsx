@@ -1,6 +1,7 @@
 import { marked } from "marked";
 import { useState } from "react";
-import { Achado, api, brl, docUrl, Estrategia, Fonte, Pendencia, Processo, Subsidios, Triagem } from "./api";
+import { useEffect } from "react";
+import { Achado, api, brl, docUrl, Estrategia, Fonte, Pendencia, Processo, ResumoAFD, Subsidios, Triagem } from "./api";
 
 export function Citacoes({ pid, fontes }: { pid: string; fontes: Fonte[] }) {
   if (!fontes?.length) return <span className="tag tag-warn">sem citação</span>;
@@ -44,6 +45,51 @@ export function VisaoTriagem({ pid, t }: { pid: string; t: Triagem }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+/* ---------------- Fonte do ponto (AFD) ---------------- */
+
+export function FontePonto({ pid, coletaEm }: { pid: string; coletaEm?: string }) {
+  const [resumo, setResumo] = useState<ResumoAFD | null>(null);
+  const [ocupado, setOcupado] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  useEffect(() => { api.afd(pid).then((r) => setResumo(r.importado)).catch(() => {}); }, [pid]);
+  const importar = async (f: File | undefined) => {
+    if (!f) return;
+    setOcupado(true); setErro(null);
+    try { setResumo(await api.importarAfd(pid, f)); } catch (e: any) { setErro(e.message); }
+    setOcupado(false);
+  };
+  return (
+    <div className="fonte">
+      <div className="fonte-cab">
+        <div>
+          <b>Fonte do ponto:</b>{" "}
+          {resumo ? <span className="tag tag-ok">AFD importado</span> : <span className="tag">sistema de ponto da empresa (simulado)</span>}
+          <div className="muted small">O AFD é o arquivo que todo relógio de ponto é obrigado a exportar (Portarias 1510/2009 e 671/2021).
+            Importado, o agente lê o ponto direto dele.</div>
+        </div>
+        <div className="acoes">
+          <label className={`botao-arquivo ${ocupado ? "desab" : ""}`}>
+            {ocupado ? "Lendo…" : "Importar AFD"}
+            <input type="file" accept=".txt,.afd,text/plain" disabled={ocupado} onChange={(e) => importar(e.target.files?.[0])} />
+          </label>
+          <a className="small" href="/rh/demo/afd.txt">baixar AFD de exemplo</a>
+        </div>
+      </div>
+      {erro && <div className="alerta">{erro}</div>}
+      {resumo && (
+        <div className="small fonte-res">
+          <b>{resumo.arquivo}</b> · {resumo.layout} · CNPJ {resumo.cnpj ?? "—"} · {resumo.marcacoes.toLocaleString("pt-BR")} marcações de{" "}
+          {resumo.empregados} empregado(s) · {resumo.periodo ? `${resumo.periodo[0]} a ${resumo.periodo[1]}` : "—"} · NSR {resumo.nsr[0]}–{resumo.nsr[1]}
+          {resumo.dias_com_batida_impar > 0 && <> · <span className="warn-tx">{resumo.dias_com_batida_impar} dia(s) com batida faltando</span></>}
+          {resumo.total_linhas_nao_lidas > 0 && <> · <span className="warn-tx">{resumo.total_linhas_nao_lidas} linha(s) não lidas</span></>}
+          <span className="muted"> · CRC não validado nesta versão</span>
+          {coletaEm && resumo.importado_em && coletaEm < resumo.importado_em && <div className="muted">A coleta já rodou com a fonte anterior: use “Rodar de novo” para refazer com o AFD.</div>}
+        </div>
+      )}
     </div>
   );
 }

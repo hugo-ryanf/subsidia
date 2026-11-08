@@ -29,6 +29,7 @@ FUNCIONARIO = {
     "matricula": "0042",
     "nome": "Carlos Eduardo Nogueira",
     "cpf": "123.456.789-09",
+    "pis": "012.34567.89-01",
     "cargo": "Repositor de câmara fria",
     "setor": "Perecíveis / câmara fria",
     "admissao": "2023-03-01",

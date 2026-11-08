@@ -240,3 +240,30 @@ if _DIST.exists():
     @app.get("/", include_in_schema=False)
     def _index():
         return _FileResponse(_DIST / "index.html")
+
+
+# --- conectores: AFD do ponto ------------------------------------------------------------
+
+@app.post("/processos/{processo_id}/afd")
+async def importar_afd(processo_id: str, arquivo: UploadFile = File(...)) -> dict:
+    """Importa o AFD (Portarias 1510/671): a coleta passa a ler o ponto deste arquivo."""
+    from app.conectores import afd
+    _processo(processo_id)
+    conteudo = await arquivo.read()
+    if len(conteudo) > 50_000_000:
+        raise HTTPException(413, "AFD acima de 50 MB")
+    resumo = afd.importar(processo_id, arquivo.filename or "afd.txt", conteudo)
+    if not resumo["marcacoes"]:
+        raise HTTPException(422, f"nenhuma marcação de ponto reconhecida no arquivo ({resumo['total_linhas_nao_lidas']} "
+                                 "linha(s) não lidas) — confira se é um AFD")
+    rastro.registrar("humano", "importou:afd", {"arquivo": resumo["arquivo"], "layout": resumo["layout"],
+                                                "marcacoes": resumo["marcacoes"], "empregados": resumo["empregados"]},
+                     processo_id=processo_id)
+    return resumo
+
+
+@app.get("/processos/{processo_id}/afd")
+def resumo_afd(processo_id: str) -> dict:
+    from app.conectores import afd
+    _processo(processo_id)
+    return {"importado": afd.resumo_importado(processo_id)}

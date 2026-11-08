@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, Job, Processo, Rastro } from "./api";
-import { VisaoEstrategia, VisaoSubsidios, VisaoTriagem } from "./etapas";
+import { FontePonto, VisaoEstrategia, VisaoSubsidios, VisaoTriagem } from "./etapas";
 import { useJob, usePolling } from "./hooks";
 import { Atividade, Metricas } from "./painel";
 
@@ -190,6 +190,7 @@ function TelaProcesso({ pid, voltar }: { pid: string; voltar: () => void }) {
                   </div>
                 </div>
                 {!liberado && <p className="muted">Aprove a etapa anterior para liberar esta (portão humano).</p>}
+                {e.id === "subsidios" && <FontePonto pid={pid} coletaEm={a.subsidios?.atualizado_em} />}
                 {e.id === "triagem" && a.triagem && <VisaoTriagem pid={pid} t={a.triagem.conteudo} />}
                 {e.id === "subsidios" && a.subsidios && a.triagem && (
                   <VisaoSubsidios pid={pid} s={a.subsidios.conteudo} tri={a.triagem.conteudo} pendencias={proc.pendencias} aoMudar={carregar} />

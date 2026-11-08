@@ -43,6 +43,12 @@ export type Processo = {
   artefatos: { triagem: Artefato<Triagem>; subsidios: Artefato<Subsidios>; estrategia: Artefato<Estrategia> };
 };
 
+export type ResumoAFD = {
+  arquivo: string; layout: string; cnpj: string | null; marcacoes: number; empregados: number;
+  dias_com_batida_impar: number; periodo: [string, string] | null; nsr: [number, number];
+  total_linhas_nao_lidas: number; crc_validado: boolean; importado_em?: string;
+};
+
 export type Job = { id: string; tipo: string; status: "queued" | "processando" | "concluido" | "erro"; etapa: string | null; erro: string | null };
 
 export type Evento = {
@@ -79,6 +85,11 @@ export const api = {
   upload: (id: string, f: File) => {
     const fd = new FormData(); fd.append("arquivo", f);
     return req<{ job_id: string }>(`/processos/${id}/documentos`, { method: "POST", body: fd });
+  },
+  afd: (id: string) => req<{ importado: ResumoAFD | null }>(`/processos/${id}/afd`),
+  importarAfd: (id: string, f: File) => {
+    const fd = new FormData(); fd.append("arquivo", f);
+    return req<ResumoAFD>(`/processos/${id}/afd`, { method: "POST", body: fd });
   },
   rodar: (id: string, etapa: "triagem" | "subsidios" | "estrategia") => req<{ job_id: string }>(`/processos/${id}/${etapa}`, { method: "POST" }),
   aprovar: (id: string, tipo: string, observacao?: string) => req(`/processos/${id}/aprovar/${tipo}`, json({ observacao })),

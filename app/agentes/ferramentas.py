@@ -89,21 +89,35 @@ def _lista_comp(caixa: Caixa, competencias) -> list[str]:
     return [c for c in competencias if c in caixa.competencias] or []
 
 
+def _fonte_ponto(caixa: Caixa):
+    """AFD importado para o processo tem prioridade sobre o sistema de ponto."""
+    from app.conectores import afd
+    if afd.resumo_importado(caixa.processo_id):
+        f = S.buscar_funcionario(caixa.matricula)["dados"] or {}
+        return "AFD importado", lambda c: afd.ponto(caixa.processo_id, f.get("cpf", ""), c, f.get("pis"))
+    return "sistema de ponto", lambda c: S.ponto(caixa.matricula, c)
+
+
 def obter_ponto(caixa: Caixa, competencias="todas") -> str:
     comps = _lista_comp(caixa, competencias)
     if not comps:
         return "nenhuma competência válida pedida (o contrato vai de " \
                f"{caixa.competencias[0]} a {caixa.competencias[-1]})"
-    com_extra, sem_reg, normais = [], [], 0
+    nome_fonte, fonte = _fonte_ponto(caixa)
+    com_extra, sem_reg, impares, normais = [], [], [], 0
     for c in comps:
-        r = _chamar_sistema(caixa, f"ponto:{c}", S.ponto, caixa.matricula, c)
+        r = _chamar_sistema(caixa, f"ponto:{c}", fonte, c)
         if r["status"] != "ok":
             sem_reg.append(c)
-        elif r["dados"]["minutos_extras"] > 0:
+            continue
+        impares += (r["dados"] or {}).get("dias_batida_impar") or []
+        if r["dados"]["minutos_extras"] > 0:
             com_extra.append(f"{c} ({_h(r['dados']['minutos_extras'])} além da jornada)")
         else:
             normais += 1
-    partes = [f"Ponto consultado em {len(comps)} competência(s)."]
+    partes = [f"Ponto consultado em {len(comps)} competência(s) (fonte: {nome_fonte})."]
+    if impares:
+        partes.append(f"Batida faltando (marcação ímpar) em: {', '.join(impares)}.")
     if com_extra:
         partes.append("Com sobrejornada registrada: " + "; ".join(com_extra) + ".")
     if sem_reg:

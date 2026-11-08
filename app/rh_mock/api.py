@@ -65,3 +65,11 @@ def ltcat(pdf: bool = False):
 def inicial_pdf() -> Response:
     return Response(inicial.gerar_pdf(), media_type="application/pdf",
                     headers={"Content-Disposition": 'inline; filename="inicial_demo.pdf"'})
+
+
+@router.get("/demo/afd.txt")
+def afd_exemplo() -> Response:
+    """AFD de exemplo da empresa fictícia (layout da Portaria 671), para testar a importação."""
+    from app.conectores import afd
+    return Response(afd.gerar_exemplo(), media_type="text/plain; charset=latin-1",
+                    headers={"Content-Disposition": 'attachment; filename="AFD_mercado_exemplo.txt"'})

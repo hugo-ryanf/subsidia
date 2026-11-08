@@ -66,6 +66,15 @@ CREATE TABLE IF NOT EXISTS artefatos (
   conteudo TEXT NOT NULL, aprovado INTEGER NOT NULL DEFAULT 0,
   atualizado_em TEXT NOT NULL, PRIMARY KEY (processo_id, tipo)
 );
+CREATE TABLE IF NOT EXISTS importacoes (
+  processo_id TEXT NOT NULL, tipo TEXT NOT NULL, resumo TEXT NOT NULL, criado_em TEXT NOT NULL,
+  PRIMARY KEY (processo_id, tipo)
+);
+CREATE TABLE IF NOT EXISTS ponto_importado (
+  processo_id TEXT NOT NULL, identificador TEXT NOT NULL, data TEXT NOT NULL,
+  jornada TEXT NOT NULL, impar INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS ix_ponto_imp ON ponto_importado(processo_id, identificador, data);
 CREATE TABLE IF NOT EXISTS pendencias (
   id TEXT PRIMARY KEY, processo_id TEXT NOT NULL, pedido_id TEXT,
   titulo TEXT NOT NULL, contexto TEXT NOT NULL,

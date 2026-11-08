@@ -35,6 +35,19 @@ da defesa são sempre do advogado.
 | Custo de IA do processo inteiro | ~US$ 0,02 |
 | Tempo do agente × mesma coleta manual (estimativa) | ~1–3 min × ~7,7 h |
 
+## Integração real: AFD do ponto
+
+Além dos sistemas simulados, o Subsídia lê o **AFD (Arquivo Fonte de Dados)**, o arquivo que **todo registrador
+eletrônico de ponto no Brasil é obrigado a exportar**, com layout fixo definido pelas Portarias 1510/2009 e 671/2021.
+Importado no processo, o agente passa a ler o ponto direto dele, sem integração com o sistema de cada fabricante:
+
+- reconhece os dois layouts de marcação (PIS da 1510 e CPF da 671) e filtra o empregado do processo;
+- monta a jornada por dia e aponta **batida faltando** (marcação ímpar) como pendência, sem descartar nada;
+- gera o espelho em PDF a partir do AFD (com arquivo e faixa de NSR) para a citação continuar valendo;
+- linha que não se entende aparece no resumo da importação. Limitação declarada: o CRC-16 ainda não é validado.
+
+Para testar: na etapa de coleta, "baixar AFD de exemplo" e depois "Importar AFD".
+
 ## Regras
 
 1. Todo input tem retorno explícito; etapas com IA retornam confiança. Falha vira status ou pendência, nunca log silencioso.

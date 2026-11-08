@@ -46,12 +46,21 @@ def _jornada(caixa: Caixa, p: dict) -> list[dict]:
                         "O agente não trouxe espelhos de ponto para este pedido.", [], "alta")]
     sem_reg = sorted(c for c, v in pontos.items() if v is None)
     for c in sem_reg:
-        titulo = f"Espelho de ponto de {c} ausente no sistema"
+        titulo = f"Ponto de {c} sem nenhuma marcação"
         registrar_pendencia(caixa, titulo, "Sem controle de jornada desta competência, presume-se verdadeira a "
                             "jornada alegada (Súmula 338 do TST). Localizar o espelho físico ou justificar.",
                             p["id"], "cruzamento")
         out.append(_achado(p, "pendencia", titulo, "Súmula 338 do TST: ausência injustificada dos controles "
                            "gera presunção da jornada da inicial nesse período.", [], "alta"))
+
+    impares = sorted({d for v in pontos.values() if v for d in v.get("dias_batida_impar") or []})
+    if impares:
+        titulo = f"Batida faltando no ponto em {len(impares)} dia(s)"
+        registrar_pendencia(caixa, titulo, f"Marcação ímpar no registro de ponto em: {', '.join(impares)}. "
+                            "Conferir com o gestor e registrar o tratamento do ponto (justificativa assinada).",
+                            p["id"], "cruzamento")
+        out.append(_achado(p, "pendencia", titulo, f"Dias: {', '.join(impares)}. Sem tratamento, a jornada desses "
+                           "dias fica sem prova completa.", _ev(caixa, *[f"ponto:{d[:7]}" for d in impares]), "media"))
 
     if p["arquetipo"] == "jornada" and "intervalo" in (p["id"] + (p.get("titulo") or "")).lower():
         dias = curtos = 0
