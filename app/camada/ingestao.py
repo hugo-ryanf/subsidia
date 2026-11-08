@@ -12,9 +12,9 @@ import numpy as np
 
 from app import db, llm, rastro
 from app.camada import chunking, extracao
-from app.config import RAIZ
+from app.config import cfg
 
-PASTA_ARQUIVOS = RAIZ / "data" / "arquivos"
+PASTA_ARQUIVOS = cfg.db_path.parent / "arquivos"  # mesmo volume do banco
 
 
 def guardar_arquivo(processo_id: str, nome: str, conteudo: bytes) -> tuple[Path, str]:
