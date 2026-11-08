@@ -35,6 +35,7 @@ TRECHOS (autos e uma AMOSTRA dos documentos coletados — não a coleta inteira)
 
 ATENÇÃO: o que foi ou não verificado (quais meses, quantos documentos) está nos ACHADOS, que cobrem
 a coleta inteira. Nunca conclua que algo "não foi coletado" só porque não aparece nos trechos.
+Não copie para o texto os rótulos dos achados (ex.: "A favor da empresa —"); escreva em prosa.
 
 Escreva em markdown, exatamente com estas seções (sem título de pedido):
 **Tese de defesa** — 2 a 4 frases.
@@ -52,11 +53,16 @@ def _risco(achados: list[dict]) -> str:
     return "baixo"
 
 
+ROTULO_ACHADO = {"favoravel": "A favor da empresa", "divergencia": "Risco (divergência)",
+                 "pendencia": "Pendente de decisão humana", "cobertura": "Não verificado"}
+
+
 def _fmt_achados(achados: list[dict], label_doc: dict[str, list[str]]) -> str:
     linhas = []
     for a in achados:
         refs = sorted({r for e in a["evidencias"] for r in label_doc.get(e["documento_id"], [])[:1]})
-        linhas.append(f"- [{a['tipo'].upper()}] {a['titulo']}: {a['detalhe']}"
+        # Rótulo em prosa (não "[PENDENCIA]"): o modelo tende a copiar marcadores entre colchetes.
+        linhas.append(f"- {ROTULO_ACHADO.get(a['tipo'], a['tipo'])} — {a['titulo']}: {a['detalhe']}"
                       + (f" (evidência: {', '.join(refs)})" if refs else ""))
     return "\n".join(linhas) or "- (nenhum achado — pedido sem documento nos sistemas)"
 

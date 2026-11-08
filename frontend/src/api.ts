@@ -49,7 +49,7 @@ export type ResumoAFD = {
   total_linhas_nao_lidas: number; crc_validado: boolean; importado_em?: string;
 };
 
-export type Job = { id: string; tipo: string; status: "queued" | "processando" | "concluido" | "erro"; etapa: string | null; erro: string | null };
+export type Job = { id: string; tipo: string; status: "queued" | "processando" | "concluido" | "erro"; etapa: string | null; erro: string | null; criado_em?: string };
 
 export type Evento = {
   id: number; tipo: string; etiqueta: string; modelo: string | null; tokens_entrada: number; tokens_saida: number;
@@ -102,3 +102,9 @@ export const docUrl = (pid: string, f: { documento_id: string; pagina_inicio?: n
 
 export const brl = (v: number | null | undefined) =>
   v == null ? "—" : v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+export const num = (v: number, casas = 1) => v.toLocaleString("pt-BR", { maximumFractionDigits: casas, minimumFractionDigits: 0 });
+export const hora = (iso?: string | null) => (iso ? new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "");
+export const horaSeg = (iso?: string | null) => (iso ? new Date(iso).toLocaleTimeString("pt-BR") : "");
+/** O modelo às vezes copia os rótulos internos dos achados ("[PENDENCIA]"): não vão para a tela. */
+export const semRotulos = (s: string) => s.replace(/[ \t]*\[(PENDENCIA|PENDÊNCIA|FAVORAVEL|FAVORÁVEL|DIVERGENCIA|DIVERGÊNCIA|COBERTURA)\][ \t]*/gi, " ").replace(/ {2,}/g, " ");
