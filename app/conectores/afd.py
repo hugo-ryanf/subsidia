@@ -159,7 +159,8 @@ def ponto(processo_id: str, cpf: str, competencia: str, pis: str | None = None) 
     rodape = (f"Espelho gerado a partir do AFD '{resumo.get('arquivo')}' ({resumo.get('layout')}), "
               f"NSR {resumo.get('nsr', ['?', '?'])[0]} a {resumo.get('nsr', ['?', '?'])[1]}."
               + (f" Dias com batida ímpar (incompleta): {', '.join(impares)}." if impares else ""))
-    pdf = P.cartao_ponto(competencia, marcacoes=marc, sistema=sistema, rodape=rodape)
+    pdf = P.cartao_ponto(competencia, marcacoes=marc, sistema=sistema, rodape=rodape,
+                         matricula=D.matricula_por_cpf(cpf))
     return {"status": "ok", "sistema": sistema, "dados": dados, "pdf": pdf,
             "nome_pdf": f"espelho_ponto_afd_{competencia}.pdf"}
 

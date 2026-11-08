@@ -15,6 +15,7 @@ from datetime import date
 from app.agentes.ferramentas import Caixa, registrar_pendencia
 from app.rh_mock.dados import DIVISOR
 
+_SABADO_ATE = re.compile(r"s[áa]bados?\b[^.;]*?\b(?:at[ée]|[àa]s|a)\s+(?:[àa]s\s+)?(\d{1,2})\s*h", re.I)
 _FRASE = re.compile(r"(?<=[.;!?])\s+(?=[A-ZÀ-Ý])")
 _NEUTRALIZ = re.compile(r"neutraliz\w*", re.I)
 _RESSALVA = (r"insuficiente\w*|parcial\w*|incomplet\w*|inexistente\w*|ineficaz\w*|inadequad\w*")
@@ -95,7 +96,7 @@ def _jornada(caixa: Caixa, p: dict) -> list[dict]:
                                evs, "media"))
         else:
             out.append(_achado(p, "favoravel", "Intervalo de 1h registrado em todos os dias",
-                               f"{dias} dias úteis com intervalo ≥ 60 min marcado no ponto (a inicial alega 20 min)."
+                               f"{dias} dias úteis com intervalo ≥ 60 min marcado no ponto."
                                f"{cobertura}", evs, "alta"))
         return out
 
@@ -128,12 +129,13 @@ def _jornada(caixa: Caixa, p: dict) -> list[dict]:
         out.append(_achado(p, "favoravel", "Horas extras pagas corretamente quando prestadas",
                            f"Sobrejornada do ponto quitada no holerite em: {', '.join(consistentes)}.",
                            _ev(caixa, *[k for c in consistentes for k in (f"ponto:{c}", f"holerite:{c}")]), "media"))
-    sabados_ate_12 = all(
-        m["saida"] <= "12:15" for v in pontos.values() if v for m in v["marcacoes"]
-        if date.fromisoformat(m["data"]).weekday() == 5)
-    if sabados_ate_12:
-        out.append(_achado(p, "favoravel", "Sábados encerrados às 12h no ponto",
-                           "A inicial alega trabalho aos sábados até 14h; o ponto registra saída por volta das 12h.",
+    alegado = _SABADO_ATE.search(p.get("alegacao") or "")
+    sabados = [m["saida"] for v in pontos.values() if v for m in v["marcacoes"]
+               if date.fromisoformat(m["data"]).weekday() == 5]
+    if alegado and sabados and max(sabados) < f"{int(alegado.group(1)) - 1:02d}:30":
+        out.append(_achado(p, "favoravel", f"Saída aos sábados até {max(sabados)} no ponto",
+                           f"A alegação fala em trabalho aos sábados até {alegado.group(1)}h; o ponto registra saída "
+                           f"no máximo às {max(sabados)}.",
                            _ev(caixa, *[f"ponto:{c}" for c in sorted(pontos) if pontos[c]][:3]), "media"))
     faltando = [c for c in caixa.competencias if c not in pontos]
     if faltando:
@@ -149,7 +151,7 @@ def _rescisao(caixa: Caixa, p: dict) -> list[dict]:
     if t["data_pagamento"] <= t["prazo_legal"]:
         return [_achado(p, "favoravel", "Rescisão paga dentro do prazo do art. 477",
                         f"Pagamento em {t['data_pagamento']} (prazo até {t['prazo_legal']}), comprovante "
-                        f"{t['comprovante']['autenticacao']}. A inicial alega pagamento só em abril/2025.",
+                        f"{t['comprovante']['autenticacao']}.",
                         _ev(caixa, "trct"), "alta")]
     return [_achado(p, "divergencia", "Rescisão paga fora do prazo",
                     f"Pago em {t['data_pagamento']}, prazo era {t['prazo_legal']}.", _ev(caixa, "trct"), "alta",
@@ -194,7 +196,7 @@ def _sst(caixa: Caixa, p: dict) -> list[dict]:
                                f"Maior intervalo entre entregas: {maior} dias; itens sem CA: {len(sem_ca)}.",
                                _ev(caixa, "epi"), "alta"))
         else:
-            out.append(_achado(p, "favoravel", "EPI térmico fornecido com CA durante todo o contrato",
+            out.append(_achado(p, "favoravel", "EPI fornecido com CA durante todo o contrato",
                                f"{len(datas)} entregas, intervalo máximo de {maior} dias, todos os itens com CA.",
                                _ev(caixa, "epi"), "alta"))
     else:
