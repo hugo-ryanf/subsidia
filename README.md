@@ -13,7 +13,7 @@
 | **Resumo** | Agente que lê a petição trabalhista, opera os sistemas de RH, cruza ponto, folha e FGTS e entrega a estratégia de defesa por pedido, com cada prova citada. |
 | **Vídeo demo** | https://www.youtube.com/watch?v=zvCosxyy4FU |
 | **Link do projeto** | https://subsidia.onrender.com |
-| **Apresentação** | [Descrição (PDF)](Subsidia_Descricao.pdf) · [Pitch (PPTX)](Subs%C3%ADdia%20Pitch.pptx) |
+| **Apresentação** | [Descrição (PDF)](Subsidia_Descricao.pdf) · [Pitch (Google Slides)](https://docs.google.com/presentation/d/1B5-2eMra6kLr4SII9Xc3fE2IwlyM9FhZ4r6-N3dUjeY/edit?slide=id.p1#slide=id.p1) |
 | **Código-fonte** | https://github.com/hugo-ryanf/subsidia |
 | **Tags** | Digital Workers, RH, Jurídico trabalhista, AI agents, RAG, Legaltech, FastAPI, Desafio Tako |
 
