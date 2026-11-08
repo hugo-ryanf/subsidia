@@ -186,3 +186,24 @@ def resolver_pendencia(processo_id: str, pendencia_id: str, body: Resolucao) -> 
     rastro.registrar("humano", f"pendencia:{body.status}", {"titulo": p["titulo"], "resolucao": body.resolucao},
                      processo_id=processo_id)
     return {"ok": True}
+
+
+@app.post("/processos/{processo_id}/estrategia", status_code=202)
+def disparar_estrategia(processo_id: str) -> dict:
+    from app.agentes import estrategia
+    _processo(processo_id)
+    return {"job_id": jobs.disparar(processo_id, "estrategia", lambda jid: estrategia.executar(processo_id, jid))}
+
+
+@app.get("/processos/{processo_id}/documentos/{documento_id}/arquivo")
+def arquivo_documento(processo_id: str, documento_id: str):
+    """PDF original de um documento citado (autos ou subsídio) — o advogado confere a fonte."""
+    from fastapi.responses import FileResponse
+    d = db.um("SELECT * FROM documentos WHERE id=? AND processo_id=?", (documento_id, processo_id))
+    if not d:
+        raise HTTPException(404, "documento não existe neste processo")
+    caminho = ingestao.PASTA_ARQUIVOS / processo_id / f"{d['sha256'][:16]}_{d['nome']}"
+    if not caminho.exists():
+        raise HTTPException(404, "arquivo não encontrado no armazenamento")
+    return FileResponse(caminho, media_type="application/pdf",
+                        headers={"Content-Disposition": f'inline; filename="{d["nome"]}"'})

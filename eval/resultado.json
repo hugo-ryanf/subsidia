@@ -1,0 +1,86 @@
+{
+  "checagens": [
+    {
+      "nome": "ingestão da inicial",
+      "ok": true,
+      "detalhe": ""
+    },
+    {
+      "nome": "triagem concluída",
+      "ok": true,
+      "detalhe": ""
+    },
+    {
+      "nome": "pedidos extraídos (valor+categoria+citação)",
+      "ok": true,
+      "detalhe": "6/6"
+    },
+    {
+      "nome": "coleta de subsídios concluída",
+      "ok": true,
+      "detalhe": ""
+    },
+    {
+      "nome": "  achado esperado: horas_extras → divergencia",
+      "ok": true,
+      "detalhe": "pendencia: Espelho de ponto de 2024-06 ausente no sistema; divergencia: Horas extras registradas e NÃO pagas: 99.2h; favoravel: Horas extras pagas corretamente "
+    },
+    {
+      "nome": "  achado esperado: intervalo → pendencia",
+      "ok": true,
+      "detalhe": "pendencia: Espelho de ponto de 2024-06 ausente no sistema; favoravel: Intervalo de 1h registrado em todos os dias"
+    },
+    {
+      "nome": "  achado esperado: multa_477 → favoravel",
+      "ok": true,
+      "detalhe": "favoravel: Rescisão paga dentro do prazo do art. 477"
+    },
+    {
+      "nome": "  achado esperado: fgts → favoravel",
+      "ok": true,
+      "detalhe": "favoravel: FGTS integral e multa de 40% recolhida"
+    },
+    {
+      "nome": "  achado esperado: insalubridade → favoravel",
+      "ok": true,
+      "detalhe": "favoravel: EPI térmico fornecido com CA durante todo o contrato; favoravel: LTCAT conclui que o EPI neutraliza o agente"
+    },
+    {
+      "nome": "  achado esperado: dano_moral → pendencia",
+      "ok": true,
+      "detalhe": "pendencia: Dano moral: sem prova documental — ouvir o gestor citado e indicar testemunhas"
+    },
+    {
+      "nome": "loops de coleta concluídos",
+      "ok": true,
+      "detalhe": "[]"
+    },
+    {
+      "nome": "estratégia concluída",
+      "ok": true,
+      "detalhe": ""
+    },
+    {
+      "nome": "seções da estratégia com citação válida",
+      "ok": true,
+      "detalhe": "6/6"
+    },
+    {
+      "nome": "horas extras classificadas como risco alto",
+      "ok": true,
+      "detalhe": "{'horas_extras_e_reflexos': 'alto', 'intervalo_intrajornada_suprimido': 'medio', 'indenizacao_danos_morais': 'medio', 'multa_art_477_clt': 'baixo', 'diferencas_fgts_e_multa_40': 'baixo', 'adicional_insalubridade': 'baixo'}"
+    }
+  ],
+  "recall_pedidos": 1.0,
+  "recall_achados": 1.0,
+  "processo_id": "proc_852f05229969",
+  "segundos_total": 325.9,
+  "custo_usd": 0.015,
+  "chamadas_modelo": 74,
+  "ferramentas": 56,
+  "tokens": 56069,
+  "documentos_coletados": 52,
+  "minutos_manual_estimados": 462,
+  "exposicao_estimada": 1250.64,
+  "aprovado": true
+}
