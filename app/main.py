@@ -9,10 +9,12 @@ from pydantic import BaseModel
 from app import db, jobs, rastro
 from app.camada import busca, ingestao
 from app.config import cfg
+from app.rh_mock import api as rh_api
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 app = FastAPI(title="Subsídia", version="0.1.0")
+app.include_router(rh_api.router)
 
 
 @app.on_event("startup")  # noqa: lifespan fica para depois

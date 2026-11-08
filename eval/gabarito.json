@@ -1,0 +1,27 @@
+{
+  "caso": "Mercado Exemplo Ltda x Carlos Eduardo Nogueira (sintético)",
+  "matricula": "0042",
+  "pedidos": [
+    {"id": "horas_extras", "arquetipo": "jornada", "valor": 18500.00,
+     "palavras": ["horas extras", "hora extra"],
+     "esperado": {"tipo": "divergencia", "severidade": "alta",
+                  "competencias": ["2024-09", "2024-10", "2024-11"],
+                  "motivo": "ponto registra sobrejornada que o holerite não pagou"}},
+    {"id": "intervalo", "arquetipo": "jornada", "valor": 6200.00,
+     "palavras": ["intervalo"],
+     "esperado": {"tipo": "pendencia", "competencias": ["2024-06"],
+                  "motivo": "espelho de ponto ausente no sistema (Súmula 338 TST)"}},
+    {"id": "multa_477", "arquetipo": "validade_rescisao", "valor": 1850.00,
+     "palavras": ["477"],
+     "esperado": {"tipo": "favoravel", "motivo": "TRCT pago em 07/03/2025, dentro do prazo (até 10/03/2025)"}},
+    {"id": "fgts", "arquetipo": "verbas_descontos", "valor": 3900.00,
+     "palavras": ["fgts"],
+     "esperado": {"tipo": "favoravel", "motivo": "extrato com todas as competências + multa de 40% recolhida"}},
+    {"id": "insalubridade", "arquetipo": "saude_acidente", "valor": 7300.00,
+     "palavras": ["insalubridade"],
+     "esperado": {"tipo": "favoravel", "motivo": "EPI térmico com CA entregue a cada 6 meses + LTCAT: frio neutralizado"}},
+    {"id": "dano_moral", "arquetipo": "assedio", "valor": 20000.00,
+     "palavras": ["dano moral", "danos morais"],
+     "esperado": {"tipo": "pendencia", "motivo": "nenhuma ocorrência registrada; ouvir o gestor e levantar testemunhas"}}
+  ]
+}
