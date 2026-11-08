@@ -68,17 +68,17 @@
     {
       "nome": "horas extras classificadas como risco alto",
       "ok": true,
-      "detalhe": "{'horas_extras_e_reflexos': 'alto', 'intervalo_intrajornada_suprimido': 'medio', 'indenizacao_danos_morais': 'medio', 'multa_art_477_clt': 'baixo', 'diferencas_fgts_e_multa_40': 'baixo', 'adicional_insalubridade': 'baixo'}"
+      "detalhe": "{'horas_extras': 'alto', 'intervalo_intrajornada': 'medio', 'danos_morais': 'medio', 'multa_art_477': 'baixo', 'diferencas_fgts': 'baixo', 'adicional_insalubridade': 'baixo'}"
     }
   ],
   "recall_pedidos": 1.0,
   "recall_achados": 1.0,
-  "processo_id": "proc_852f05229969",
-  "segundos_total": 325.9,
-  "custo_usd": 0.015,
-  "chamadas_modelo": 74,
+  "processo_id": "proc_ab57a4a5159a",
+  "segundos_total": 340.7,
+  "custo_usd": 0.0174,
+  "chamadas_modelo": 73,
   "ferramentas": 56,
-  "tokens": 56069,
+  "tokens": 55865,
   "documentos_coletados": 52,
   "minutos_manual_estimados": 462,
   "exposicao_estimada": 1250.64,
