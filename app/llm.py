@@ -130,14 +130,18 @@ def chat(system: str, user: str, *, pesado: bool = False, json_mode: bool = Fals
     }
     if json_mode:
         body["response_format"] = {"type": "json_object"}
-    t0 = time.time()
-    dados = _post("/chat/completions", body, model, timeout)
-    escolha = (dados.get("choices") or [{}])[0]
-    conteudo = ((escolha.get("message") or {}).get("content") or "").strip()
-    _registrar("chat", model, dados.get("usage") or {}, time.time() - t0, etiqueta)
-    if not conteudo:
-        raise LLMError(f"{model}: resposta vazia (finish_reason={escolha.get('finish_reason')})")
-    return conteudo
+    # Resposta vazia acontece de vez em quando (medido com o Gemma na Featherless): uma nova
+    # tentativa resolve na prática; persistindo, sobe LLMError para quem chamou decidir.
+    for tentativa in range(2):
+        t0 = time.time()
+        dados = _post("/chat/completions", body, model, timeout)
+        escolha = (dados.get("choices") or [{}])[0]
+        conteudo = ((escolha.get("message") or {}).get("content") or "").strip()
+        _registrar("chat", model, dados.get("usage") or {}, time.time() - t0,
+                   etiqueta + (" (nova tentativa)" if tentativa else ""))
+        if conteudo:
+            return conteudo
+    raise LLMError(f"{model}: resposta vazia (finish_reason={escolha.get('finish_reason')})")
 
 
 def chat_json(system: str, user: str, **kw) -> dict:

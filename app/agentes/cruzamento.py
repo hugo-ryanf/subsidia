@@ -62,13 +62,17 @@ def _jornada(caixa: Caixa, p: dict) -> list[dict]:
                     a, b = (int(x[:2]) * 60 + int(x[3:]) for x in (m["saida_intervalo"], m["retorno_intervalo"]))
                     curtos += (b - a) < 60
         evs = _ev(caixa, *[f"ponto:{c}" for c in sorted(pontos) if pontos[c]][:6])
+        verificadas = sorted(c for c in pontos if pontos[c])
+        cobertura = (f" Cobertura: {len(verificadas)} competências verificadas ({verificadas[0]} a {verificadas[-1]})"
+                     + (f", exceto {', '.join(sem_reg)} (sem registro)" if sem_reg else "") + ".") if verificadas else ""
         if curtos:
             out.append(_achado(p, "divergencia", f"Intervalo inferior a 1h em {curtos} dia(s)",
-                               f"De {dias} dias úteis com marcação, {curtos} têm intervalo < 60 min.", evs, "media"))
+                               f"De {dias} dias úteis com marcação, {curtos} têm intervalo < 60 min.{cobertura}",
+                               evs, "media"))
         else:
             out.append(_achado(p, "favoravel", "Intervalo de 1h registrado em todos os dias",
-                               f"{dias} dias úteis com intervalo ≥ 60 min marcado no ponto (a inicial alega 20 min).",
-                               evs, "alta"))
+                               f"{dias} dias úteis com intervalo ≥ 60 min marcado no ponto (a inicial alega 20 min)."
+                               f"{cobertura}", evs, "alta"))
         return out
 
     sh = _salario_hora(caixa)

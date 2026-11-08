@@ -78,6 +78,18 @@ def _executar_acao(caixa: F.Caixa, pedido: dict, acao: str, args: dict) -> str:
         return f"erro do sistema: {e}"
 
 
+def _playbook(caixa: F.Caixa, pedido: dict, passos: list[dict], erro: str) -> dict:
+    """Degradação graciosa: sem modelo disponível, executa as ferramentas do playbook da
+    categoria (determinístico). A coleta acontece; fica registrado que foi sem o agente."""
+    rastro.registrar("decisao", f"subsidios:{pedido['id']}:playbook", {"motivo": erro})
+    for nome in catalogo.ARQUETIPOS.get(pedido["arquetipo"], {}).get("ferramentas", []):
+        args = {"competencias": "todas"} if nome in ("obter_ponto", "obter_holerite") else {}
+        passos.append({"acao": nome, "args": args, "pensamento": "playbook (modelo indisponível)",
+                       "observacao": _executar_acao(caixa, pedido, nome, args)})
+    return {"pedido_id": pedido["id"], "passos": passos, "concluido": True, "modo": "playbook",
+            "resumo": f"coleta pelo playbook determinístico (modelo indisponível: {erro[:120]})"}
+
+
 def _loop_pedido(caixa: F.Caixa, pedido: dict) -> dict:
     arq = catalogo.ARQUETIPOS.get(pedido["arquetipo"], {})
     passos: list[dict] = []
@@ -93,10 +105,12 @@ def _loop_pedido(caixa: F.Caixa, pedido: dict) -> dict:
         try:
             dec = llm.chat_json(SYSTEM.format(ferramentas=F.descricao_para_prompt()), prompt,
                                 max_tokens=800, etiqueta=f"subsidios:{pedido['id']}")
-        except llm.LLMError as e:
-            F.registrar_pendencia(caixa, f"Agente não conseguiu decidir a coleta de '{pedido['titulo']}'",
-                                  str(e), pedido["id"], "agente")
-            break
+        except llm.LLMError:
+            try:  # modelo leve falhou → o pesado assume a decisão
+                dec = llm.chat_json(SYSTEM.format(ferramentas=F.descricao_para_prompt()), prompt, pesado=True,
+                                    max_tokens=3000, etiqueta=f"subsidios:{pedido['id']} (modelo pesado)")
+            except llm.LLMError as e:
+                return _playbook(caixa, pedido, passos, str(e))
         acao, args = str(dec.get("acao", "")).strip(), dec.get("args") or {}
         rastro.registrar("decisao", f"subsidios:{pedido['id']}",
                          {"pensamento": dec.get("pensamento"), "acao": acao, "args": args})
@@ -120,7 +134,8 @@ def _loop_pedido(caixa: F.Caixa, pedido: dict) -> dict:
         F.registrar_pendencia(caixa, f"Coleta de '{pedido['titulo']}' não concluída pelo agente",
                               f"Encerrada após {len(passos)} passos sem 'concluir'. Conferir os documentos.",
                               pedido["id"], "agente")
-    return {"pedido_id": pedido["id"], "passos": passos, "concluido": concluido, "resumo": resumo}
+    return {"pedido_id": pedido["id"], "passos": passos, "concluido": concluido, "modo": "agente",
+            "resumo": resumo}
 
 
 def executar(processo_id: str, job_id: str) -> dict:

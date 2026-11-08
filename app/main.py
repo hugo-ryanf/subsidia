@@ -207,3 +207,27 @@ def arquivo_documento(processo_id: str, documento_id: str):
         raise HTTPException(404, "arquivo não encontrado no armazenamento")
     return FileResponse(caminho, media_type="application/pdf",
                         headers={"Content-Disposition": f'inline; filename="{d["nome"]}"'})
+
+
+@app.get("/processos/{processo_id}/jobs")
+def jobs_do_processo(processo_id: str) -> dict:
+    """Último job de cada tipo — a UI retoma o acompanhamento depois de um reload."""
+    _processo(processo_id)
+    linhas = db.todos("SELECT id,tipo,status,etapa,erro,criado_em,atualizado_em FROM jobs "
+                      "WHERE processo_id=? ORDER BY criado_em", (processo_id,))
+    return {j["tipo"]: j for j in linhas}
+
+
+# --- frontend (build do Vite servido pelo mesmo app: um serviço só no deploy) ---------
+from pathlib import Path as _Path  # noqa: E402
+
+from fastapi.responses import FileResponse as _FileResponse  # noqa: E402
+from fastapi.staticfiles import StaticFiles as _StaticFiles  # noqa: E402
+
+_DIST = _Path(__file__).resolve().parent.parent / "frontend" / "dist"
+if _DIST.exists():
+    app.mount("/assets", _StaticFiles(directory=_DIST / "assets"), name="assets")
+
+    @app.get("/", include_in_schema=False)
+    def _index():
+        return _FileResponse(_DIST / "index.html")

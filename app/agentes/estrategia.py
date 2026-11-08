@@ -30,8 +30,11 @@ ACHADOS DO CRUZAMENTO (calculados pelo sistema, confiáveis):
 
 RISCO CALCULADO: {risco}
 
-TRECHOS (autos e documentos coletados nos sistemas da empresa):
+TRECHOS (autos e uma AMOSTRA dos documentos coletados — não a coleta inteira):
 {trechos}
+
+ATENÇÃO: o que foi ou não verificado (quais meses, quantos documentos) está nos ACHADOS, que cobrem
+a coleta inteira. Nunca conclua que algo "não foi coletado" só porque não aparece nos trechos.
 
 Escreva em markdown, exatamente com estas seções (sem título de pedido):
 **Tese de defesa** — 2 a 4 frases.
