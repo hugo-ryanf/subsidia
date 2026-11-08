@@ -23,6 +23,7 @@ export function VisaoTriagem({ pid, t }: { pid: string; t: Triagem }) {
   const p = t.processo;
   return (
     <div>
+      {t.aviso && <div className="tag tag-warn">{t.aviso}</div>}
       <div className="grade-proc">
         <div><span>Processo</span><b>{p.numero ?? "—"}</b></div>
         <div><span>Reclamante</span><b>{p.reclamante ?? "—"}</b></div>

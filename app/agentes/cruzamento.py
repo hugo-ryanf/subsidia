@@ -9,10 +9,25 @@ pendencia (falta algo; humano resolve) · cobertura (o agente não verificou tud
 """
 from __future__ import annotations
 
+import re
 from datetime import date
 
 from app.agentes.ferramentas import Caixa, registrar_pendencia
 from app.rh_mock.dados import DIVISOR
+
+_FRASE = re.compile(r"(?<=[.;!?])\s+(?=[A-ZÀ-Ý])")
+_NEUTRALIZ = re.compile(r"neutraliz\w*", re.I)
+_RESSALVA = (r"insuficiente\w*|parcial\w*|incomplet\w*|inexistente\w*|ineficaz\w*|inadequad\w*")
+# Termo negativo em qualquer ponto ANTES da menção, na mesma frase.
+_NEGA_ANTES = re.compile(
+    rf"\b(?:n[ãa]o|nem|nunca|jamais|sem|nenhum\w*|incapaz\w*|imposs[íi]vel|invi[áa]vel|deix\w+ de|falh\w+|"
+    rf"aus[êe]ncia|{_RESSALVA})\b", re.I)
+# Depois da menção só vale o que nega a própria neutralização: "neutralização não foi comprovada"
+# nega; "neutraliza o agente, não sendo devido o adicional" e "neutraliza e não é devido" não negam.
+_NEGA_DEPOIS = re.compile(
+    r"^(?:\s+(?!e\b)[\w-]+){0,4}?\s+(?:"
+    r"n[ãa]o\s+(?:foi|foram|é|são|est[áa]|restou|ficou|houve|ocorre\w*|se\b|comprovad\w*|demonstrad\w*|"
+    rf"atingid\w*|alcan[çc]ad\w*)|{_RESSALVA})\b", re.I)
 
 
 def _ev(caixa: Caixa, *chaves: str) -> list[dict]:
@@ -155,6 +170,18 @@ def _fgts(caixa: Caixa, p: dict) -> list[dict]:
                     f"{e['multa_40']['data']} ({e['multa_40']['guia']}).", _ev(caixa, "fgts"), "alta")]
 
 
+def _ltcat_atesta_neutralizacao(conclusao: str) -> bool:
+    """Só é prova a favor se o laudo afirma a neutralização e nenhuma menção a nega ou ressalva.
+    Na dúvida conta contra: alarme falso aparece para o advogado, prova a favor indevida inverte o risco."""
+    mencoes = 0
+    for frase in _FRASE.split(conclusao):
+        for m in _NEUTRALIZ.finditer(frase):
+            mencoes += 1
+            if _NEGA_ANTES.search(frase[:m.start()]) or _NEGA_DEPOIS.search(frase[m.end():]):
+                return False
+    return mencoes > 0
+
+
 def _sst(caixa: Caixa, p: dict) -> list[dict]:
     out = []
     epi, ltcat = caixa.dados.get("epi"), caixa.dados.get("ltcat")
@@ -173,7 +200,7 @@ def _sst(caixa: Caixa, p: dict) -> list[dict]:
     else:
         out.append(_achado(p, "cobertura", "Ficha de EPI não consultada", "", [], "alta"))
     if ltcat:
-        neutro = "neutraliz" in ltcat["conclusao"].lower()
+        neutro = _ltcat_atesta_neutralizacao(ltcat["conclusao"])
         out.append(_achado(p, "favoravel" if neutro else "divergencia",
                            "LTCAT conclui que o EPI neutraliza o agente" if neutro else "LTCAT reconhece insalubridade",
                            ltcat["conclusao"], _ev(caixa, "ltcat"), "alta"))
@@ -197,6 +224,28 @@ REGRAS = {"jornada": _jornada, "validade_rescisao": _rescisao, "verbas_descontos
           "saude_acidente": _sst, "assedio": _assedio}
 
 
+def _sem_exposicao_repetida(achados: list[dict], pedidos: list[dict]) -> None:
+    """Pedidos da mesma categoria leem a mesma caixa e geram o mesmo achado (ex.: horas extras e DSR).
+    Cada pedido mantém a prova, mas o valor fica em um só, para o total não somar o mesmo dinheiro."""
+    rotulos = {p["id"]: f"{p['id']} {p.get('titulo') or ''}".lower() for p in pedidos}
+    titulos = {p["id"]: p.get("titulo") or p["id"] for p in pedidos}
+
+    def principal(a: dict) -> bool:
+        r = rotulos[a["pedido_id"]]
+        return "extra" in r and "dsr" not in r and "reflexo" not in r
+
+    grupos: dict[tuple, list[dict]] = {}
+    for a in achados:
+        if a["exposicao_estimada"]:
+            grupos.setdefault((a["tipo"], a["titulo"]), []).append(a)
+    for grupo in grupos.values():
+        titular = next(filter(principal, grupo), grupo[0])
+        for a in grupo:
+            if a is not titular:
+                a["exposicao_estimada"] = None
+                a["detalhe"] += f" Valor já computado no pedido '{titulos[titular['pedido_id']]}'; não somar de novo."
+
+
 def cruzar(caixa: Caixa, pedidos: list[dict]) -> list[dict]:
     achados: list[dict] = []
     for p in pedidos:
@@ -206,4 +255,5 @@ def cruzar(caixa: Caixa, pedidos: list[dict]) -> list[dict]:
                                    "Análise manual dos documentos coletados.", [], "media"))
             continue
         achados.extend(regra(caixa, p))
+    _sem_exposicao_repetida(achados, pedidos)
     return achados
